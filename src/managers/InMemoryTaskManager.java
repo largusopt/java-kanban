@@ -144,6 +144,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (taskMap.containsKey(index)) {
             System.out.println("Элемент с индексом " + index + " удален");
             taskMap.remove(index);
+            historyManager.remove(index);
         }
     }
 
@@ -153,8 +154,10 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("Эпик с индексом " + index + " удален");
             Epic epic = epicMap.get(index); // получили название эпика
             epicMap.remove(index);
+            historyManager.remove(index);
             for (Integer indSubtask : epic.getIndSubtasks()) {
                 subtaskMap.remove(indSubtask);
+                historyManager.remove(indSubtask);
             }
         }
     }
@@ -167,6 +170,7 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("Сабтаск с индексом " + index + " удален");
             subtaskMap.remove(index);
             setNewStatus(epic);
+            historyManager.remove(index);
         }
     }
 
