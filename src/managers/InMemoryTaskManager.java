@@ -74,7 +74,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteTasks() { // удалить весь список задач
+    public void deleteTasks() {
         for (Task task :taskMap.values()){
             historyManager.remove(task.getInd());
         }
@@ -82,10 +82,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteEpic()
-    {
+    public void deleteEpic() {
         for (Epic epic: epicMap.values()){
-
             for (Integer indSubtask : epic.getIndSubtasks()) {
                 historyManager.remove(indSubtask);
             }
