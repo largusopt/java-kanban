@@ -9,9 +9,9 @@ import java.util.Map;
 
 
 public class InHistoryManager implements HistoryManager {
-    public Map<Integer, Node<Task>> receivedTasksMap;
-    public Node<Task> tail;
-    public Node<Task> head;
+    private  Map<Integer, Node<Task>> receivedTasksMap;
+    private  Node<Task> tail;
+    private  Node<Task> head;
 
     public InHistoryManager() {
 
@@ -39,7 +39,7 @@ public class InHistoryManager implements HistoryManager {
     }
 
     public void remove(int id) {
-        removeNode(receivedTasksMap.get(id));
+        removeNode(receivedTasksMap.remove(id));
         receivedTasksMap.remove(id);
     }
 
