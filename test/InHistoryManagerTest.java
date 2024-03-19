@@ -1,11 +1,10 @@
-
-
 import managers.Managers;
 import managers.TaskManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.StatusOfTasks;
 import tasks.Task;
+
 import java.util.ArrayList;
 import java.util.List;
 
