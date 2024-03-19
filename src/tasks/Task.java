@@ -5,12 +5,21 @@ public class Task {
     protected String description;
     protected StatusOfTasks status;
     protected int ind;
+    TaskType taskType;
 
     public Task(String title, String description, StatusOfTasks status) {
         this.title = title;
         this.description = description;
         this.status = status;
     }
+    public Task(int ind, String title, String description, StatusOfTasks status) {
+        this.ind = ind;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.taskType = TaskType.TASK;
+    }
+    public Task(){}
 
     public void setId(int ind) {
         this.ind = ind;
@@ -45,7 +54,9 @@ public class Task {
                 ", Статус='" + status + '\'' +
                 '}';
     }
-
+    public String toStringFromFile() {
+        return String.format("%s,%s,%s,%s,%s,%s", ind, taskType, title, status, description, "");
+    }
 
 }
 

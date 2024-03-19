@@ -1,8 +1,11 @@
+import managers.FileBackedTaskManager;
 import managers.InMemoryTaskManager;
 import tasks.Epic;
 import tasks.StatusOfTasks;
 import tasks.Subtask;
 import tasks.Task;
+
+import java.io.File;
 
 public class Main {
 
@@ -38,6 +41,8 @@ public class Main {
         for (Task task : manager.getHistory()) {
             System.out.println(task);
         }
+        FileBackedTaskManager fileBackedTasksManager = FileBackedTaskManager.loadFromFile(new File("data/data.csv"));
+        fileBackedTasksManager.addTasks(epic1);
     }
 }
 
