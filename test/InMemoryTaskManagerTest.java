@@ -1,4 +1,3 @@
-
 import managers.Managers;
 import managers.TaskManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,7 +6,6 @@ import tasks.Epic;
 import tasks.StatusOfTasks;
 import tasks.Subtask;
 import tasks.Task;
-
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;

@@ -1,5 +1,4 @@
-import managers.FileBackedTaskManager;
-import managers.InMemoryTaskManager;
+import managers.*;
 import tasks.Epic;
 import tasks.StatusOfTasks;
 import tasks.Subtask;
@@ -10,7 +9,7 @@ import java.io.File;
 public class Main {
 
     public static void main(String[] args) {
-        InMemoryTaskManager manager = new InMemoryTaskManager();
+        TaskManager manager = Managers.getDefault();
         manager.addTasks(new Task("купить молоко", "-", StatusOfTasks.DONE));
         Epic epic1 = new Epic("переезд", "-");
         manager.addEpic(epic1);
@@ -28,9 +27,6 @@ public class Main {
         for (Task epic : manager.getAllEpic()) {
             System.out.println(epic);
 
-            for (Task task : manager.getSubtaskForEp(epic1)) {
-                System.out.println("--> " + task);
-            }
         }
         System.out.println("Подзадачи:");
         for (Task subtask : manager.getAllSubtask()) {
@@ -41,8 +37,7 @@ public class Main {
         for (Task task : manager.getHistory()) {
             System.out.println(task);
         }
-        FileBackedTaskManager fileBackedTasksManager = FileBackedTaskManager.loadFromFile(new File("data/data.csv"));
-        fileBackedTasksManager.addTasks(epic1);
+        TaskManager fileBackedTasksManager = FileBackedTaskManager.loadFromFile(new File("data/data.csv"));
     }
 }
 
