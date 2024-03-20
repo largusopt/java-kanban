@@ -113,7 +113,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public static Task fromString(String lines, TaskType taskType, FileBackedTaskManager fileBackedTaskManager) {
         String[] line = lines.split(",");
-        String epicId=null;
+        String epicId = null;
         int id = Integer.parseInt(line[0]);
         String name = String.valueOf(line[2]);
         StatusOfTasks status = StatusOfTasks.valueOf(line[3]);

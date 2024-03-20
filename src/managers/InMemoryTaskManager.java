@@ -16,6 +16,7 @@ public class InMemoryTaskManager implements TaskManager {
     HashMap<Integer, Subtask> subtaskMap = new HashMap<>();
     HistoryManager historyManager = Managers.getDefaultHistory();
     int ind = 0;
+
     public InMemoryTaskManager() {
         ind = 0;
         taskMap = new HashMap<>();
