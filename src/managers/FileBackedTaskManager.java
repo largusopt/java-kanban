@@ -29,7 +29,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             try {
                 Path path = Files.createFile(Paths.get(fileName));
             } catch (IOException e) {
-                throw new ManagerSaveException("Ошибка создания файла.");
+                String errorMessage = "Ошибка при создании файла 'back up.csv'";
+                throw new ManagerSaveException(errorMessage, e);
             }
         }
     }
@@ -40,7 +41,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try {
             data = Files.readString(Path.of(file.getAbsolutePath()));
         } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка чтения файла.");
+            String errorMessage = "Ошибка при чтении файла 'back up.csv'";
+            throw new ManagerSaveException(errorMessage, e);
         }
         String[] lines = data.split("\n");
         String history = "";
@@ -72,11 +74,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
                     case SUBTASK:
                         Subtask subtask = (Subtask) fromString(line, TaskType.SUBTASK, fileBackedTasksManager);
-                        id = subtask.getInd();
-                        if (id > maxId) {
-                            maxId = id;
+
+                        if (subtask.getInd() > maxId) {
+                            maxId = subtask.getInd();
                         }
-                        fileBackedTasksManager.subtaskMap.put(id, subtask);
+                        int epicId = Integer.parseInt(line.split(",")[5].trim());
+                        Epic parentEpic = fileBackedTasksManager.epicMap.get(epicId);
+                        if (parentEpic != null) {
+                            parentEpic.getIndSubtasks().add(subtask.getInd());
+                        } else {
+                            System.out.println("Эпик с id " + epicId + " не найден");
+                        }
+                        fileBackedTasksManager.subtaskMap.put(subtask.getInd(), subtask);
                         break;
 
                     case TASK:
@@ -96,6 +105,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
         fileBackedTasksManager.ind = maxId;
         List<Integer> ids = historyFromString(history);
+
         for (Integer taskId : ids) {
             fileBackedTasksManager.historyManager.addTask(getTasksOfDifferentKinds(taskId, fileBackedTasksManager));
         }
@@ -128,38 +138,32 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             case EPIC:
                 return new Epic(id, name, description, status);
             case SUBTASK:
-                return new Subtask(id, name, description, status, fileBackedTaskManager.epicMap.get(Integer.valueOf(epicId)));
+                Epic parentEpic = fileBackedTaskManager.epicMap.get(Integer.valueOf(epicId));
+                if (parentEpic != null) {
+                    return new Subtask(id, name, description, status, parentEpic);
+                } else {
+                    throw new RuntimeException("Эпик с id " + epicId + " не найден");
+                }
+
             default:
                 return null;
         }
     }
 
     private static Task getTasksOfDifferentKinds(int id, InMemoryTaskManager inMemoryTaskManager) {
-        Task task = null;
-        for (Task t : inMemoryTaskManager.getAllTasks()) {
-            if (t.getInd() == id) {
-                task = t;
-                break;
-            }
-        }
+        Task task = inMemoryTaskManager.getIndexTasks(id);
         if (task != null) {
             return task;
         }
-        Epic epic = null;
-        for (Epic e : inMemoryTaskManager.getAllEpic()) {
-            if (e.getInd() == id) {
-                epic = e;
-                break;
-            }
+        Task epic = inMemoryTaskManager.getIndexEpic(id);
+        if (epic != null) {
+            return epic;
         }
-        Subtask subtask = null;
-        for (Subtask s : inMemoryTaskManager.getAllSubtask()) {
-            if (s.getInd() == id) {
-                subtask = s;
-                break;
-            }
+        Task subtask = inMemoryTaskManager.getIndexSubtask(id);
+        if (subtask != null) {
+            return subtask;
         }
-        return subtask;
+        return null;
     }
 
     private static String toString(HistoryManager manager) {
@@ -174,29 +178,26 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public void save() {
         try (Writer writer = new FileWriter(file)) {
             writer.write("id,type,title,status,description,epic\n");
-            HashMap<Integer, String> allTasks = new HashMap<>();
 
-            Collection<Task> tasks = super.getAllTasks();
-            for (Task ts : tasks) {
-                allTasks.put(ts.getInd(), ts.toStringFromFile());
-            }
-            Collection<Epic> epics = super.getAllEpic();
-            for (Epic ep : epics) {
-                allTasks.put(ep.getInd(), ep.toStringFromFile());
+
+            for (Task ts : super.getAllTasks()) {
+                writer.write(ts.toStringFromFile() + "\n");
             }
 
-            Collection<Subtask> subtasks = super.getAllSubtask();
-            for (Subtask sb : subtasks) {
-                allTasks.put(sb.getInd(), sb.toStringFromFile());
+            for (Epic ep : super.getAllEpic()) {
+                writer.write(ep.toStringFromFile() + "\n");
             }
-            for (String name : allTasks.values()) {
-                writer.write(String.format("%s\n", name));
+
+            for (Subtask sb : super.getAllSubtask()) {
+                writer.write(sb.toStringFromFile() + "\n");
             }
+
             writer.write("\n");
             writer.write(toString(this.historyManager));
 
         } catch (IOException e) {
-            throw new ManagerSaveException("Невозможно прочитать файл.");
+            String errorMessage = "Ошибка при сохранении файла 'back up.csv'";
+            throw new ManagerSaveException(errorMessage, e);
         }
     }
 
